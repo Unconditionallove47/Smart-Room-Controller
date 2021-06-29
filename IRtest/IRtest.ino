@@ -1,18 +1,34 @@
-#include <IRremote.h>
+int led = 13; // define the LED pin
+int digitalPin = 21; // KY-026 digital interface
+int analogPin = 20; // KY-026 analog interface
+int digitalVal; // digital readings
+int analogVal; //analog readings
 
-int RECV_PIN = 11; // define input pin on Arduino 
-IRrecv irrecv(RECV_PIN); 
-decode_results results; // decode_results class is defined in IRremote.h
+void setup()
+{
+  pinMode(led, OUTPUT);
+  pinMode(digitalPin, INPUT);
+//  pinMode(analogPin, INPUT);
+  Serial.begin(9600);
+}
 
-void setup() { 
-  Serial.begin(9600); 
-  irrecv.enableIRIn(); // Start the receiver 
-} 
-
-void loop() { 
-  if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX); 
-    irrecv.resume(); // Receive the next value 
+void loop()
+{
+  // Read the digital interface
+  digitalVal = digitalRead(digitalPin); 
+  if(digitalVal == HIGH) // if flame is detected
+  {
+    digitalWrite(led, HIGH); // turn ON Arduino's LED
   }
-  delay (100); // small delay to prevent reading errors
+  else
+  {
+    digitalWrite(led, LOW); // turn OFF Arduino's LED
+  }
+
+  // Read the analog interface
+  analogVal = analogRead(analogPin); 
+  Serial.println(analogVal); // print analog value to serial
+
+  delay(100);
+
 }
