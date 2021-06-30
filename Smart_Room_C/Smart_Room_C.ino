@@ -86,7 +86,7 @@ void setup() {
   button.setPressTicks(250);    //BUTTON TICKS
 }
 
-void loop() {
+void loop() {       //Remember to create functions!!
   timeStamp = millis();
   button.tick();
   position = tempF;    //SETS POSITION TO THE TEMP
