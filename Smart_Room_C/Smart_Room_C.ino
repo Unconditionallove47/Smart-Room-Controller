@@ -23,6 +23,11 @@
 #define SCREEN_HEIGHT 64      // OLED display height, in pixels
 #define OLED_RESET     4      // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C     ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+unsigned long timeStamp;    //Timestamp for current time
+unsigned long lastStamp1;
+unsigned long lastStamp2;
+unsigned long lastStamp3;
+unsigned long lastStamp;
 const int PIXELCOUNT = 12;   //NEO PIXEL COUNT
 const int PIXELPIN = 17;     //NEO PIXEL PINS SETUP
 float tempF = 0;       // FOR BME
@@ -85,6 +90,7 @@ void setup() {
 }
 
 void loop() {
+  timeStamp = millis();
   button.tick();
   position = tempF;    //SETS POSITION TO THE TEMP
   tempGuage = map(position, 10, 120, 0, 12);  //encoder Pos to Position based on 0-95 being convered to 0-15(of available lights)
@@ -104,27 +110,35 @@ void loop() {
   pressPA = bme.readPressure(); //pascals
   pressinHg = (pressPA / 33.863886666667);  //PRESSURE CONVERSION
   humidRH = bme.readHumidity(); //%RH
-  Serial.print("Temp=");            //PRINTS FOR TEMP ON SM
-  Serial.print(tempF);
-  Serial.println("°F");
-  delay(1000);
-  Serial.print("pressure=");        //PRINTS FOR PRESSURE ON SM
-  Serial.print(pressinHg / 100.0F);
-  Serial.println("hPa");
-  delay(1000);
-  Serial.print("Humidity=");         //PRINTS FOR HUMIDITY ON SM
-  Serial.print(bme.readHumidity());
-  Serial.println("%");
-  delay(1000);
+
+  if ((timeStamp - lastStamp) > 2000) {
+    Serial.print("Temp=");            //PRINTS FOR TEMP ON SM
+    Serial.print(tempF);
+    Serial.println("°F");
+    lastStamp = millis;
+  }
+
+  if ((timeStamp - lastStamp1) > 2000) {
+    Serial.print("pressure=");        //PRINTS FOR PRESSURE ON SM
+    Serial.print(pressinHg / 100.0F);
+    Serial.println("hPa");
+    lastStamp1 = millis;
+  }
+  if ((timeStamp - lastStamp2) > 2000) {
+    Serial.print("Humidity=");         //PRINTS FOR HUMIDITY ON SM
+    Serial.print(bme.readHumidity());
+    Serial.println("%");
+    lastStamp2 = millis;
+  }
   testdrawstyles();        //OLED DISPLAY TEXT STYLE
-//  if (tempF < 68 ) {
-//    setHue(3, true, HueBlue, 103, 247);
-//  }
-//  else if (tempF >= 69 && tempF <= 80 ) {
-//    setHue(3, true, HueYellow, 103, 247);
-//  }
-//  else
-//    setHue(3, true, HueRed, 103, 247);
+  if (tempF < 68 ) {
+    setHue(3, true, HueBlue, 103, 247);
+  }
+  else if (tempF >= 69 && tempF <= 80 ) {
+    setHue(3, true, HueYellow, 103, 247);
+  }
+  else
+    setHue(3, true, HueRed, 103, 247);
 
   // Read the digital interface
   digitalVal = digitalRead(digitalPin);
@@ -137,21 +151,24 @@ void loop() {
     digitalWrite(led, LOW); // turn OFF Arduino's LED
   }
   // Read the analog interface
-  analogVal = analogRead(analogPin);
+  
+  if ((timeStamp - lastStamp3) > 1000) {
+    analogVal = analogRead(analogPin);
   Serial.println(analogVal); // print analog value to serial
-  delay(100);
-  //  if (tempF > 80) {
-  //    myWemo.switchON (0);     //temp over 80 "fan" on
-  //  }
-  //  else {
-  //      myWemo.switchOFF (0);
-  //    }
-  //  if (tempF >= 69 && tempF <= 79) {       //If temp is between 69 and 80 "heater" on
-  //    myWemo.switchON (1);
-  //  }
-  //  else {
-  //      myWemo.switchOFF (1);              //else turn it off
-  //    }
+    lastStamp3 = millis;
+  }
+//  if (tempF > 80) {
+//    myWemo.switchON (0);     //temp over 80 "fan" on
+//  }
+//  else {
+//    myWemo.switchOFF (0);
+//  }
+//  if (tempF >= 69 && tempF <= 79) {       //If temp is between 69 and 80 "heater" on
+//    myWemo.switchON (1);
+//  }
+//  else {
+//    myWemo.switchOFF (1);              //else turn it off
+//  }
 }
 
 void testdrawstyles(void) {            //VOID FOR OLED DISPLAY TEXT
