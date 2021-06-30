@@ -119,7 +119,7 @@ void loop() {
     Serial.println("%");
     lastStamp = millis();
   }
-  testdrawstyles();        //OLED DISPLAY TEXT STYLE
+  oledtext();        //OLED DISPLAY TEXT STYLE
   if ((timeStamp - lastStamp) > 3000) {
     if (tempF < 68 ) {
       setHue(3, true, HueBlue, 103, 247);
@@ -164,12 +164,12 @@ void loop() {
   //  }
 }
 
-void testdrawstyles(void) {            //VOID FOR OLED DISPLAY TEXT
+void oledtext(void) {            //VOID FOR OLED DISPLAY TEXT
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE, SSD1306_BLACK);   // Draw 'inverse' text
-  display.setTextSize(1);
+  display.setTextSize(1.5);
   display.setCursor(0, 0);
-  display.printf("temp=%f \n Pressure=%f \n Humidity=%f\n", tempF, pressinHg / 100.0F, bme.readHumidity());
+  display.printf("Temperature is=%f \n Current Pressure=%f \n Humidity Level=%f\n", tempF, pressinHg / 100.0F, bme.readHumidity());
   display.display();
 
 }
