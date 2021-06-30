@@ -123,21 +123,15 @@ void loop() {
   if ((timeStamp - lastStamp) > 3000) {
     if (tempF < 68 ) {
       setHue(3, true, HueBlue, 103, 247);
-      lastStamp = millis();
     }
-  }
- if ((timeStamp - lastStamp) > 3000) { 
-if (tempF >= 69 && tempF <= 80 ) {
+    else if (tempF >= 69 && tempF <= 80 ) {
       setHue(3, true, HueYellow, 103, 247);
-      lastStamp = millis();
     }
-  }
-  else {
-    if ((timeStamp - lastStamp) > 3000) {
-      (tempF <=81);
+    else {
+      (tempF <= 81);
       setHue(3, true, HueRed, 103, 247);
-      lastStamp = millis();
     }
+    lastStamp = millis();
   }
   // Read the digital interface
   digitalVal = digitalRead(digitalPin);
