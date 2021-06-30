@@ -108,7 +108,7 @@ void loop() {
   pressinHg = (pressPA / 33.863886666667);  //PRESSURE CONVERSION
   humidRH = bme.readHumidity(); //%RH
 
-  if ((timeStamp - lastStamp) > 2000) {
+  if ((timeStamp - lastStamp) > 3000) {
     Serial.print("Temp=");            //PRINTS FOR TEMP ON SM
     Serial.print(tempF);
     Serial.println("°F");
@@ -120,20 +120,21 @@ void loop() {
     lastStamp = millis();
   }
   testdrawstyles();        //OLED DISPLAY TEXT STYLE
-  if (tempF < 68 ) {
-    if ((timeStamp - lastStamp) > 1000) {
+  if ((timeStamp - lastStamp) > 3000) {
+    if (tempF < 68 ) {
       setHue(3, true, HueBlue, 103, 247);
       lastStamp = millis();
     }
   }
-  else if (tempF >= 69 && tempF <= 80 ) {
-    if ((timeStamp - lastStamp) > 1000) {
+ if ((timeStamp - lastStamp) > 3000) { 
+if (tempF >= 69 && tempF <= 80 ) {
       setHue(3, true, HueYellow, 103, 247);
       lastStamp = millis();
     }
   }
   else {
-    if ((timeStamp - lastStamp) > 1000) {
+    if ((timeStamp - lastStamp) > 3000) {
+      (tempF <=81);
       setHue(3, true, HueRed, 103, 247);
       lastStamp = millis();
     }
@@ -150,7 +151,7 @@ void loop() {
   }
   // Read the analog interface
 
-  if ((timeStamp - lastStamp) > 2000) {
+  if ((timeStamp - lastStamp) > 3000) {
     analogVal = analogRead(analogPin);
     Serial.println(analogVal); // print analog value to serial
     lastStamp = millis();
