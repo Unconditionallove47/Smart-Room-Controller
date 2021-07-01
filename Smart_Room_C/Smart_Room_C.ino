@@ -92,7 +92,7 @@ void loop() {
   button.tick();
   position = tempF;    //SETS POSITION TO THE TEMP
   tempGuage = map(position, 10, 120, 0, 12);  // Position based on 10-120 degrees being convered to 0-12(of available lights)
-  heat = map(heat, 0,1023, 1023,0);  //Switches heat value to min max instead of max min
+  heat = map(heat, 0, 1023, 1023, 0); //Switches heat value to min max instead of max min
   pixel.clear();
   if (tempF < 68) {
     pixel.fill( 0x0000FF, 0, tempGuage);    //COLD TEMP FOR NEO
@@ -126,14 +126,28 @@ void loop() {
 
   if ((timeStamp - lastStamp) > 3000) {       //TEMP SET HUE BLUE
     if (tempF < 68 ) {
+//      setHue(1, true, HueBlue, 103, 247);
+//      setHue(2, true, HueBlue, 103, 247);
       setHue(3, true, HueBlue, 103, 247);
+//      setHue(4, true, HueBlue, 103, 247);
+//      setHue(5, true, HueBlue, 103, 247);
+
+
     }
     else if (tempF >= 69 && tempF <= 80 ) {    //TEMP SET HUE YELLOW
+//      setHue(1, true, HueYellow, 103, 247);
+//      setHue(2, true, HueYellow, 103, 247);
       setHue(3, true, HueYellow, 103, 247);
+//      setHue(4, true, HueYellow, 103, 247);
+//      setHue(5, true, HueYellow, 103, 247);
     }
     else {
       (tempF <= 81);                           //TEMP SET HUE RED
+//      setHue(1, true, HueRed, 103, 247);
+//      setHue(2, true, HueRed, 103, 247);
       setHue(3, true, HueRed, 103, 247);
+//      setHue(4, true, HueRed, 103, 247);
+//      setHue(5, true, HueRed, 103, 247);
     }
     lastStamp = millis();                     //MILLIS TIMESTAMP
   }
@@ -148,7 +162,7 @@ void loop() {
     digitalWrite(led, LOW); // turn OFF Arduino's LED
   }
   // Read the analog interface
-     heat = analogRead(analogPin);
+  heat = analogRead(analogPin);
   if ((timeStamp - lastStamp) > 3000) {
     Serial.println(heat); // print analog value to serial
     lastStamp = millis();
@@ -176,7 +190,7 @@ void oledtexttemp (void) {            //VOID FOR OLED DISPLAY TEXT
   display.setTextColor(SSD1306_WHITE, SSD1306_BLACK);   // Draw 'inverse' text
   display.setTextSize(1.5);
   display.setCursor(0, 0);
-  display.printf("Temperature is=%f \n Current Pressure=%f \n Humidity Level=%f\n Heat Level=%i\n", tempF, pressinHg / 100.0F, bme.readHumidity(),heat);
+  display.printf("Temperature is=%f \n Current Pressure=%f \n Humidity Level=%f\n Heat Level=%i\n", tempF, pressinHg / 100.0F, bme.readHumidity(), heat);
   display.display();
 }
 
