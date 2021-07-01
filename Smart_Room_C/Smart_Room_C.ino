@@ -54,6 +54,7 @@ Adafruit_NeoPixel pixel(PIXELCOUNT , PIXELPIN , NEO_GRB + NEO_KHZ800);
 OneButton button(23, false);    //BUTTON SET TO FALSE
 
 void setup() {
+  
   Serial.begin(9600);
   pinMode(led, OUTPUT);   //FOR IR
   pinMode(digitalPin, INPUT);    //FOR IR
@@ -81,14 +82,15 @@ void setup() {
   display.display();                 //DISPLAYS DISP
   display.setRotation(rot);          //DISPLAY ROTATION
   button.attachClick(click);    //BUTTON CLICK
-  button.attachLongPressStart(longPress);
+  button.attachLongPressStart(longPress);   //BUTTON LONGPRESS
   buttonState = false;           //BUTTON STATE
-  buttonStateHold = false;
+  buttonStateHold = false;       //BUTTON STATE FOR HOLD
   button.setPressTicks(250);    //BUTTON TICKS
 }
 
 void loop() {
-  timeStamp = millis();
+  
+  timeStamp = millis();     /TIMESTAMP TO MILLISECONDS
   button.tick();
   position = tempF;    //SETS POSITION TO THE TEMP
   tempGuage = map(position, 10, 120, 0, 12);  // Position based on 10-120 degrees being convered to 0-12(of available lights)
@@ -109,7 +111,6 @@ void loop() {
   pressPA = bme.readPressure(); //pascals
   pressinHg = (pressPA / 33.863886666667);  //PRESSURE CONVERSION
   humidRH = bme.readHumidity(); //%RH
-
   if ((timeStamp - lastStamp) > 3000) {
     Serial.print("Temp=");            //PRINTS FOR TEMP ON SM
     Serial.print(tempF);
@@ -122,32 +123,28 @@ void loop() {
     lastStamp = millis();
   }
   oledtexttemp();        //OLED DISPLAY TEXT STYLE
-  //  oledtextfire();
-
   if ((timeStamp - lastStamp) > 3000) {       //TEMP SET HUE BLUE
     if (tempF < 68 ) {
-//      setHue(1, true, HueBlue, 103, 247);
-//      setHue(2, true, HueBlue, 103, 247);
+      //      setHue(1, true, HueBlue, 103, 247);
+      //      setHue(2, true, HueBlue, 103, 247);
       setHue(3, true, HueBlue, 103, 247);
-//      setHue(4, true, HueBlue, 103, 247);
-//      setHue(5, true, HueBlue, 103, 247);
-
-
+      //      setHue(4, true, HueBlue, 103, 247);
+      //      setHue(5, true, HueBlue, 103, 247);
     }
     else if (tempF >= 69 && tempF <= 80 ) {    //TEMP SET HUE YELLOW
-//      setHue(1, true, HueYellow, 103, 247);
-//      setHue(2, true, HueYellow, 103, 247);
+      //      setHue(1, true, HueYellow, 103, 247);
+      //      setHue(2, true, HueYellow, 103, 247);
       setHue(3, true, HueYellow, 103, 247);
-//      setHue(4, true, HueYellow, 103, 247);
-//      setHue(5, true, HueYellow, 103, 247);
+      //      setHue(4, true, HueYellow, 103, 247);
+      //      setHue(5, true, HueYellow, 103, 247);
     }
     else {
       (tempF <= 81);                           //TEMP SET HUE RED
-//      setHue(1, true, HueRed, 103, 247);
-//      setHue(2, true, HueRed, 103, 247);
+      //      setHue(1, true, HueRed, 103, 247);
+      //      setHue(2, true, HueRed, 103, 247);
       setHue(3, true, HueRed, 103, 247);
-//      setHue(4, true, HueRed, 103, 247);
-//      setHue(5, true, HueRed, 103, 247);
+      //      setHue(4, true, HueRed, 103, 247);
+      //      setHue(5, true, HueRed, 103, 247);
     }
     lastStamp = millis();                     //MILLIS TIMESTAMP
   }
@@ -184,22 +181,26 @@ void loop() {
     myWemo.switchOFF (3);
   }
 }
-
 void oledtexttemp (void) {            //VOID FOR OLED DISPLAY TEXT
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE, SSD1306_BLACK);   // Draw 'inverse' text
   display.setTextSize(1.5);
-  display.setCursor(0, 0);
+  display.setCursor(0, 0);    //PRINT F BELOW PRINTS EVERYTHING TO SCREEN,TEMP,PRESSURE,HUMIDITY,HEAT READING
   display.printf("Temperature is=%f \n Current Pressure=%f \n Humidity Level=%f\n Heat Level=%i\n", tempF, pressinHg / 100.0F, bme.readHumidity(), heat);
   display.display();
 }
-
 void click() {                   //VOID FOR BUTTON CLICK
   buttonState = !buttonState;
   Serial.println("Single Press");
 }
-
 void longPress() {        //void for BUTTON HOLD CLICK
   buttonStateHold = !buttonStateHold;
   Serial.println("Hold Press");
+}
+void HueSelect() {                                  //BAD ATTEMPTS AT SETTING HUE'S
+  HueSelect(setHue(1, true, HueYellow, 103, 247))
+//            (setHue(2, true, HueYellow, 103, 247))
+//             (setHue(3, true, HueYellow, 103, 247))
+//              (setHue(4, true, HueYellow, 103, 247))
+//               (setHue(5, true, HueYellow, 103, 247))
 }
