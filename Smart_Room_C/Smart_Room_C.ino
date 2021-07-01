@@ -54,7 +54,7 @@ Adafruit_NeoPixel pixel(PIXELCOUNT , PIXELPIN , NEO_GRB + NEO_KHZ800);
 OneButton button(23, false);    //BUTTON SET TO FALSE
 
 void setup() {
-  
+
   Serial.begin(9600);
   pinMode(led, OUTPUT);   //FOR IR
   pinMode(digitalPin, INPUT);    //FOR IR
@@ -89,8 +89,8 @@ void setup() {
 }
 
 void loop() {
-  
-  timeStamp = millis();     /TIMESTAMP TO MILLISECONDS
+
+  timeStamp = millis();     // TIMESTAMP TO MILLISECONDS
   button.tick();
   position = tempF;    //SETS POSITION TO THE TEMP
   tempGuage = map(position, 10, 120, 0, 12);  // Position based on 10-120 degrees being convered to 0-12(of available lights)
@@ -125,26 +125,15 @@ void loop() {
   oledtexttemp();        //OLED DISPLAY TEXT STYLE
   if ((timeStamp - lastStamp) > 3000) {       //TEMP SET HUE BLUE
     if (tempF < 68 ) {
-      //      setHue(1, true, HueBlue, 103, 247);
-      //      setHue(2, true, HueBlue, 103, 247);
-      setHue(3, true, HueBlue, 103, 247);
-      //      setHue(4, true, HueBlue, 103, 247);
-      //      setHue(5, true, HueBlue, 103, 247);
+      setMyHue(true,HueBlue);
+    
     }
     else if (tempF >= 69 && tempF <= 80 ) {    //TEMP SET HUE YELLOW
-      //      setHue(1, true, HueYellow, 103, 247);
-      //      setHue(2, true, HueYellow, 103, 247);
-      setHue(3, true, HueYellow, 103, 247);
-      //      setHue(4, true, HueYellow, 103, 247);
-      //      setHue(5, true, HueYellow, 103, 247);
+    setMyHue(true,HueYellow);
     }
     else {
       (tempF <= 81);                           //TEMP SET HUE RED
-      //      setHue(1, true, HueRed, 103, 247);
-      //      setHue(2, true, HueRed, 103, 247);
-      setHue(3, true, HueRed, 103, 247);
-      //      setHue(4, true, HueRed, 103, 247);
-      //      setHue(5, true, HueRed, 103, 247);
+     setMyHue(true,HueRed);
     }
     lastStamp = millis();                     //MILLIS TIMESTAMP
   }
@@ -197,10 +186,12 @@ void longPress() {        //void for BUTTON HOLD CLICK
   buttonStateHold = !buttonStateHold;
   Serial.println("Hold Press");
 }
-void HueSelect() {                                  //BAD ATTEMPTS AT SETTING HUE'S
-  HueSelect(setHue(1, true, HueYellow, 103, 247))
-//            (setHue(2, true, HueYellow, 103, 247))
-//             (setHue(3, true, HueYellow, 103, 247))
-//              (setHue(4, true, HueYellow, 103, 247))
-//               (setHue(5, true, HueYellow, 103, 247))
+void setMyHue(bool Enabled, int color)  {                                 //HUE FUNCTIONN WORKS<3
+  int Sat = 247;
+  int Bri = 103;
+  int i;
+  for ( i = 1; i <= 5; i++) {
+    setHue(i, Enabled, color, Bri, Sat);
+  }
+
 }
