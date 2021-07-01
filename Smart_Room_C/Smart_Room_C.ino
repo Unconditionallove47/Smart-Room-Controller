@@ -34,6 +34,7 @@ float pressPA;         //PRESSURE FOR BME CONVERSION
 float humidRH;         //BME HUMIDITY
 float tempGuage = tempF;   //FOR TEMP CONV
 bool buttonState;         //FOR BUTTON FUNC
+bool buttonStateHold;
 bool status;
 bool status1;
 int position;           //BME AND NEO
@@ -79,8 +80,9 @@ void setup() {
   display.display();                 //DISPLAYS DISP
   display.setRotation(rot);          //DISPLAY ROTATION
   button.attachClick(click);    //BUTTON CLICK
-  button.attachDoubleClick(doubleClick);
+  button.attachLongPressStart(longPress);
   buttonState = false;           //BUTTON STATE
+  buttonStateHold = false;
   button.setPressTicks(250);    //BUTTON TICKS
 }
 
@@ -154,19 +156,19 @@ void loop() {
     myWemo.switchON (0);     //temp over 80 "fan" on
     myWemo.switchON (2);
   }
-  //    else {
-  //      myWemo.switchOFF (0);
-  //      myWemo.switchOFF (2);
-  //    }
-  if (tempF >= 69 && tempF <= 79 && clicks < 0) {     //If temp is between 69 and 80 "heater" on
-    myWemo.switchON (1);
-    myWemo.switchON (3);
+  if (buttonState == true && tempF > 80) {
+    myWemo.switchOFF(0);
+    myWemo.switchOFF(2);
   }
-
-  if (tempF >= 69 && tempF <= 79 && clicks == 0) {    //If temp is between 69 and 80 "heater" on
-    myWemo.switchOFF (1);
-    myWemo.switchOFF (3);
-  }
+    if (tempF >= 69 && tempF <= 79 && buttonStateHold == false) {     //If temp is between 69 and 80 "heater" on
+      myWemo.switchON (1);
+      myWemo.switchON (3);
+    }
+  
+    if (tempF >= 69 && tempF <= 79 && buttonStateHold == true) {    //If temp is between 69 and 80 "heater" on
+      myWemo.switchOFF (1);
+      myWemo.switchOFF (3);
+    }
 
   //else {
   //    myWemo.switchOFF (1);              //else turn it off
@@ -181,6 +183,7 @@ void loop() {
     myWemo.switchOFF(2);
   }
 }
+
 
 void oledtexttemp (void) {            //VOID FOR OLED DISPLAY TEXT
   display.clearDisplay();
@@ -206,10 +209,7 @@ void click() {                   //VOID FOR BUTTON CLICK
   Serial.println("Single Press");
 }
 
-void doubleClick() {        //void for BUTTON DOUBLE CLICK
-  clicks++;
-  Serial.println("Double Press");
-  if (clicks > 2) {
-    (clicks = 0);
-  }
+void longPress() {        //void for BUTTON DOUBLE CLICK
+  buttonStateHold = !buttonStateHold;
+  Serial.println("Hold Press");
 }
