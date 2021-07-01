@@ -52,9 +52,9 @@ Adafruit_NeoPixel pixel(PIXELCOUNT , PIXELPIN , NEO_GRB + NEO_KHZ800);
 OneButton button(23, false);    //BUTTON SET TO FALSE
 
 void setup() {
+  Serial.begin(9600);
   pinMode(led, OUTPUT);   //FOR IR
   pinMode(digitalPin, INPUT);    //FOR IR
-  Serial.begin(9600);
   pinMode(10, OUTPUT);
   digitalWrite(10, HIGH);
   pinMode(4, OUTPUT);
@@ -76,9 +76,7 @@ void setup() {
   pixel.setBrightness(15);       //NEOPIXEL SETTING
   (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) ;      //OLED
   status = bme.begin(0X76);          //BME START
-  display.clearDisplay();            //CLEARS DISP
   display.display();                 //DISPLAYS DISP
-  display.invertDisplay(false);      //DISPLAY OPENING
   display.setRotation(rot);          //DISPLAY ROTATION
   button.attachClick(click);    //BUTTON CLICK
   button.attachDoubleClick(doubleClick);
@@ -86,7 +84,7 @@ void setup() {
   button.setPressTicks(250);    //BUTTON TICKS
 }
 
-void loop() {       //Remember to create functions!!
+void loop() {
   timeStamp = millis();
   button.tick();
   position = tempF;    //SETS POSITION TO THE TEMP
@@ -119,7 +117,9 @@ void loop() {       //Remember to create functions!!
     Serial.println("%");
     lastStamp = millis();
   }
-  oledtext();        //OLED DISPLAY TEXT STYLE
+  oledtexttemp();        //OLED DISPLAY TEXT STYLE
+  //  oledtextfire();
+
   if ((timeStamp - lastStamp) > 3000) {
     if (tempF < 68 ) {
       setHue(3, true, HueBlue, 103, 247);
@@ -150,29 +150,50 @@ void loop() {       //Remember to create functions!!
     Serial.println(analogVal); // print analog value to serial
     lastStamp = millis();
   }
-  //  if (tempF > 80) {
-  //    myWemo.switchON (0);     //temp over 80 "fan" on
-  //  }
-  //  else {
-  //    myWemo.switchOFF (0);
-  //  }
+   if (buttonState == true && tempF > 80) {
+    myWemo.switchOFF(0);
+    myWemo.switchOFF(2);
+  }
+  if (tempF > 80) {
+    myWemo.switchON (0);     //temp over 80 "fan" on
+    myWemo.switchON (2);
+  }
+    else {
+      myWemo.switchOFF (0);
+      myWemo.switchOFF (2);
+    }
   //  if (tempF >= 69 && tempF <= 79) {       //If temp is between 69 and 80 "heater" on
   //    myWemo.switchON (1);
+  //    myWemo.switchON (3);
   //  }
   //  else {
   //    myWemo.switchOFF (1);              //else turn it off
+  //    myWemo.switchOFF (3);
   //  }
+  //  if (buttonState == false) {
+  //    myWemo.switchON(0);
+  //    myWemo.switchON(2);
+  //  }
+ 
 }
 
-void oledtext(void) {            //VOID FOR OLED DISPLAY TEXT
+void oledtexttemp (void) {            //VOID FOR OLED DISPLAY TEXT
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE, SSD1306_BLACK);   // Draw 'inverse' text
   display.setTextSize(1.5);
   display.setCursor(0, 0);
   display.printf("Temperature is=%f \n Current Pressure=%f \n Humidity Level=%f\n", tempF, pressinHg / 100.0F, bme.readHumidity());
   display.display();
-
 }
+//void oledtextfire (void) {            //VOID FOR OLED DISPLAY TEXT
+//  display.clearDisplay();
+//  display.setTextColor(SSD1306_WHITE, SSD1306_BLACK);   // Draw 'inverse' text
+//  display.setTextSize(1.5);
+//  display.setCursor(0, 0);
+//  display.printf("Fire Detected=%i\n", analogVal());
+//  display.display();
+//
+//}
 void click() {                   //VOID FOR BUTTON CLICK
   buttonState = !buttonState;
   Serial.println("Single Press");
