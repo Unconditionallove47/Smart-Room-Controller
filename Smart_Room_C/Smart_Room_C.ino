@@ -38,7 +38,7 @@ bool status;
 bool status1;
 int position;           //BME AND NEO
 int rot = 2;
-int p;                 //INTEGER FOR PRESS X2
+int clicks;                 //INTEGER FOR PRESS X2
 int led = 13;       // define the LED pin  **FOR IR**
 int digitalPin = 21;      // KY-026 digital interface  **FOR IR**
 int analogPin = 20;      // KY-026 analog interface  **FOR IR**
@@ -150,23 +150,25 @@ void loop() {
     Serial.println(analogVal); // print analog value to serial
     lastStamp = millis();
   }
-   if (buttonState == true && tempF > 80) {
-    myWemo.switchOFF(0);
-    myWemo.switchOFF(2);
-  }
-  if (tempF > 80) {
+  if (tempF >= 80 && buttonState == false) {
     myWemo.switchON (0);     //temp over 80 "fan" on
     myWemo.switchON (2);
   }
-    else {
-      myWemo.switchOFF (0);
-      myWemo.switchOFF (2);
-    }
-  //  if (tempF >= 69 && tempF <= 79) {       //If temp is between 69 and 80 "heater" on
-  //    myWemo.switchON (1);
-  //    myWemo.switchON (3);
-  //  }
-  //  else {
+  //    else {
+  //      myWemo.switchOFF (0);
+  //      myWemo.switchOFF (2);
+  //    }
+  if (tempF >= 69 && tempF <= 79 && clicks < 0) {     //If temp is between 69 and 80 "heater" on
+    myWemo.switchON (1);
+    myWemo.switchON (3);
+  }
+
+  if (tempF >= 69 && tempF <= 79 && clicks == 0) {    //If temp is between 69 and 80 "heater" on
+    myWemo.switchOFF (1);
+    myWemo.switchOFF (3);
+  }
+
+  //else {
   //    myWemo.switchOFF (1);              //else turn it off
   //    myWemo.switchOFF (3);
   //  }
@@ -174,7 +176,10 @@ void loop() {
   //    myWemo.switchON(0);
   //    myWemo.switchON(2);
   //  }
- 
+  if (buttonState == true && tempF > 80) {
+    myWemo.switchOFF(0);
+    myWemo.switchOFF(2);
+  }
 }
 
 void oledtexttemp (void) {            //VOID FOR OLED DISPLAY TEXT
@@ -185,6 +190,7 @@ void oledtexttemp (void) {            //VOID FOR OLED DISPLAY TEXT
   display.printf("Temperature is=%f \n Current Pressure=%f \n Humidity Level=%f\n", tempF, pressinHg / 100.0F, bme.readHumidity());
   display.display();
 }
+
 //void oledtextfire (void) {            //VOID FOR OLED DISPLAY TEXT
 //  display.clearDisplay();
 //  display.setTextColor(SSD1306_WHITE, SSD1306_BLACK);   // Draw 'inverse' text
@@ -194,14 +200,16 @@ void oledtexttemp (void) {            //VOID FOR OLED DISPLAY TEXT
 //  display.display();
 //
 //}
+
 void click() {                   //VOID FOR BUTTON CLICK
   buttonState = !buttonState;
   Serial.println("Single Press");
 }
+
 void doubleClick() {        //void for BUTTON DOUBLE CLICK
-  p++;
+  clicks++;
   Serial.println("Double Press");
-  if (p > 2) {
-    (p = 0);
+  if (clicks > 2) {
+    (clicks = 0);
   }
 }
