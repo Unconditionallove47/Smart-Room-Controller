@@ -34,10 +34,11 @@ float pressPA;         //PRESSURE FOR BME CONVERSION
 float humidRH;         //BME HUMIDITY
 float tempGuage = tempF;   //FOR TEMP CONV
 bool buttonState;         //FOR BUTTON FUNC
-bool buttonStateHold;
+bool buttonStateHold;     //FOR HOLD FUNC
 bool status;
 bool status1;
-int position;           //BME AND NEO
+int heat;
+int position;            //BME AND NEO
 int rot = 2;
 int clicks;                 //INTEGER FOR PRESS X2
 int led = 13;       // define the LED pin  **FOR IR**
@@ -90,16 +91,17 @@ void loop() {
   timeStamp = millis();
   button.tick();
   position = tempF;    //SETS POSITION TO THE TEMP
-  tempGuage = map(position, 10, 120, 0, 12);  //encoder Pos to Position based on 0-95 being convered to 0-15(of available lights)
+  tempGuage = map(position, 10, 120, 0, 12);  // Position based on 10-120 degrees being convered to 0-12(of available lights)
+  heat = map(heat, 0,1023, 1023,0);  //Switches heat value to min max instead of max min
   pixel.clear();
   if (tempF < 68) {
-    pixel.fill( 0x0000FF, 0, tempGuage);    //COLD TEMP
+    pixel.fill( 0x0000FF, 0, tempGuage);    //COLD TEMP FOR NEO
   }
-  else if (tempF >= 69 && tempF <= 80) {    //MED TEMP
+  else if (tempF >= 69 && tempF <= 80) {    //MED TEMP FOR NEO
     pixel.fill( 0x808000 , 0, tempGuage);
   }
   else {
-    pixel.fill(0xFF0000, 0, tempGuage);     //HOT TEMP
+    pixel.fill(0xFF0000, 0, tempGuage);     //HOT TEMP FOR NEO
   }
   pixel.show();
   tempC = bme.readTemperature(); //deg C   //TEMP CONVERSION
@@ -122,18 +124,18 @@ void loop() {
   oledtexttemp();        //OLED DISPLAY TEXT STYLE
   //  oledtextfire();
 
-  if ((timeStamp - lastStamp) > 3000) {
+  if ((timeStamp - lastStamp) > 3000) {       //TEMP SET HUE BLUE
     if (tempF < 68 ) {
       setHue(3, true, HueBlue, 103, 247);
     }
-    else if (tempF >= 69 && tempF <= 80 ) {
+    else if (tempF >= 69 && tempF <= 80 ) {    //TEMP SET HUE YELLOW
       setHue(3, true, HueYellow, 103, 247);
     }
     else {
-      (tempF <= 81);
+      (tempF <= 81);                           //TEMP SET HUE RED
       setHue(3, true, HueRed, 103, 247);
     }
-    lastStamp = millis();
+    lastStamp = millis();                     //MILLIS TIMESTAMP
   }
   // Read the digital interface
   digitalVal = digitalRead(digitalPin);
@@ -146,70 +148,44 @@ void loop() {
     digitalWrite(led, LOW); // turn OFF Arduino's LED
   }
   // Read the analog interface
-
+     heat = analogRead(analogPin);
   if ((timeStamp - lastStamp) > 3000) {
-    analogVal = analogRead(analogPin);
-    Serial.println(analogVal); // print analog value to serial
+    Serial.println(heat); // print analog value to serial
     lastStamp = millis();
   }
   if (tempF >= 80 && buttonState == false) {
-    myWemo.switchON (0);     //temp over 80 "fan" on
+    myWemo.switchON (0);                          //temp over 80 "fan" on
     myWemo.switchON (2);
   }
-  if (buttonState == true && tempF > 80) {
+  if (buttonState == true && tempF > 80) {         //TEMP OVER 80 "FAN" OFF
     myWemo.switchOFF(0);
     myWemo.switchOFF(2);
   }
-    if (tempF >= 69 && tempF <= 79 && buttonStateHold == false) {     //If temp is between 69 and 80 "heater" on
-      myWemo.switchON (1);
-      myWemo.switchON (3);
-    }
-  
-    if (tempF >= 69 && tempF <= 79 && buttonStateHold == true) {    //If temp is between 69 and 80 "heater" on
-      myWemo.switchOFF (1);
-      myWemo.switchOFF (3);
-    }
-
-  //else {
-  //    myWemo.switchOFF (1);              //else turn it off
-  //    myWemo.switchOFF (3);
-  //  }
-  //  if (buttonState == false) {
-  //    myWemo.switchON(0);
-  //    myWemo.switchON(2);
-  //  }
-  if (buttonState == true && tempF > 80) {
-    myWemo.switchOFF(0);
-    myWemo.switchOFF(2);
+  if (tempF >= 69 && tempF <= 79 && buttonStateHold == false) {     //If temp is between 69 and 80 "heater" on
+    myWemo.switchON (1);
+    myWemo.switchON (3);
+  }
+  if (tempF >= 69 && tempF <= 79 && buttonStateHold == true) {    //If temp is between 69 and 80 "heater" OFF
+    myWemo.switchOFF (1);
+    myWemo.switchOFF (3);
   }
 }
-
 
 void oledtexttemp (void) {            //VOID FOR OLED DISPLAY TEXT
   display.clearDisplay();
   display.setTextColor(SSD1306_WHITE, SSD1306_BLACK);   // Draw 'inverse' text
   display.setTextSize(1.5);
   display.setCursor(0, 0);
-  display.printf("Temperature is=%f \n Current Pressure=%f \n Humidity Level=%f\n", tempF, pressinHg / 100.0F, bme.readHumidity());
+  display.printf("Temperature is=%f \n Current Pressure=%f \n Humidity Level=%f\n Heat Level=%i\n", tempF, pressinHg / 100.0F, bme.readHumidity(),heat);
   display.display();
 }
-
-//void oledtextfire (void) {            //VOID FOR OLED DISPLAY TEXT
-//  display.clearDisplay();
-//  display.setTextColor(SSD1306_WHITE, SSD1306_BLACK);   // Draw 'inverse' text
-//  display.setTextSize(1.5);
-//  display.setCursor(0, 0);
-//  display.printf("Fire Detected=%i\n", analogVal());
-//  display.display();
-//
-//}
 
 void click() {                   //VOID FOR BUTTON CLICK
   buttonState = !buttonState;
   Serial.println("Single Press");
 }
 
-void longPress() {        //void for BUTTON DOUBLE CLICK
+void longPress() {        //void for BUTTON HOLD CLICK
   buttonStateHold = !buttonStateHold;
   Serial.println("Hold Press");
 }
