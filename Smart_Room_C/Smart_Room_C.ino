@@ -193,5 +193,4 @@ void setMyHue(bool Enabled, int color)  {                                 //HUE 
   for ( i = 1; i <= 5; i++) {
     setHue(i, Enabled, color, Bri, Sat);
   }
-
 }
